@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title slot="primary">
+      Zapatillas
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <div class="ion-padding">
+    <ion-list>
+      <ion-item *ngFor="let zapatilla of zapatillas" (click)="zapatillaTapped(zapatilla)">
+        <ion-thumbnail slot="start">
+          <img src="{{zapatilla.image}}">
+        </ion-thumbnail>
+        <ion-label> {{zapatilla.name}}</ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>
+<ion-toolbar>
+  <img src="https://cdn2.iconfinder.com/data/icons/sport-135/128/1_sport_shoes__fitness_running_shoes_sports_marathon_run_running_sneaker-29-128.png" />
+  <ion-title slot="primary">
+    Desarrollo de Interfaces
+  </ion-title>
+</ion-toolbar>
