@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { ZapatilladbService } from '../core/zapatilladbservice.service';
+import { ZapatillascrudService } from '../core/zapatillacrud.service';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { IZapatilla } from '../shared/interfaces';
@@ -14,7 +14,7 @@ export class CreatePage implements OnInit {
   zapatillaForm: FormGroup;
   constructor(
     private router: Router,
-    private zapatilladbService: ZapatilladbService,
+    private zapatillascrudService: ZapatillascrudService,
     public toastController: ToastController
   ) { }
   ngOnInit() {
@@ -54,7 +54,7 @@ export class CreatePage implements OnInit {
     this.zapatilla = this.zapatillaForm.value;
     let nextKey = this.zapatilla.name.trim();
     this.zapatilla.id = nextKey;
-    this.zapatilladbService.setItem(nextKey, this.zapatilla);
+    this.zapatillascrudService.create_Zapatilla(this.zapatilla);
     console.warn(this.zapatillaForm.value);
   }
 }

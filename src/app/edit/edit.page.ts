@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
-import { ZapatilladbService } from '../core/zapatilladbservice.service';
+import { ZapatillascrudService } from '../core/zapatillacrud.service';
 import { IZapatilla } from '../shared/interfaces';
 
 @Component({
@@ -18,11 +18,12 @@ export class EditPage implements OnInit {
   constructor(
     private activatedrouter: ActivatedRoute,
     private router: Router,
-    private zapatilladbService: ZapatilladbService,
+    private zapatillascrudService: ZapatillascrudService,
     public toastController: ToastController
   ) { }
 
   ngOnInit() {
+    this.id = this.activatedrouter.snapshot.params.id;
     this.zapatillaForm = new FormGroup({
       name: new FormControl(''),
       description: new FormControl(''),
@@ -30,19 +31,32 @@ export class EditPage implements OnInit {
       image: new FormControl(''),
       price: new FormControl(''),
     });
-    this.id = this.activatedrouter.snapshot.params.id;
-    this.zapatilladbService.getItem(this.id).then(
-      (data: IZapatilla) => {
-        this.zapatilla = data;
-
-        this.zapatillaForm = new FormGroup({
-          name: new FormControl(this.zapatilla.name),
-          description: new FormControl(this.zapatilla.description),
-          category: new FormControl(this.zapatilla.category),
-          image: new FormControl(this.zapatilla.image),
-          price: new FormControl(this.zapatilla.price),
-        });
+    this.zapatillascrudService.read_Zapatilla().subscribe(data => {
+      let zapatillas = data.map(e => {
+        return {
+          id: e.payload.doc.id,
+          isEdit: false,
+          name: e.payload.doc.data()['name'],
+          description: e.payload.doc.data()['description'],
+          category: e.payload.doc.data()['category'],
+          image: e.payload.doc.data()['image'],
+          price: e.payload.doc.data()['price']
+        };
+      })
+      console.log(zapatillas);
+      zapatillas.forEach(element => {
+          if(element.id == this.id){
+            this.zapatilla = element;
+            this.zapatillaForm = new FormGroup({
+              name: new FormControl(this.zapatilla.name),
+              description: new FormControl(this.zapatilla.description),
+              category: new FormControl(this.zapatilla.category),
+              image: new FormControl(this.zapatilla.image),
+              price: new FormControl(this.zapatilla.price),
+            });
+          }
       });
+    });
   }
 
   async onSubmit() {
@@ -55,7 +69,6 @@ export class EditPage implements OnInit {
           icon: 'save',
           text: 'ACEPTAR',
           handler: () => {
-            this.zapatilladbService.remove(this.id);
             this.saveZapatilla();
             this.router.navigate(['home']);
           }
@@ -73,7 +86,7 @@ export class EditPage implements OnInit {
   saveZapatilla() {
     this.zapatilla = this.zapatillaForm.value;
     this.zapatilla.id = this.id;
-    this.zapatilladbService.setItem(this.id, this.zapatilla);
+    this.zapatillascrudService.update_Zapatilla(this.id, this.zapatilla);
     console.warn(this.zapatillaForm.value);
   }
 

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ZapatilladbService } from '../core/zapatilladbservice.service';
+import { ZapatillascrudService } from '../core/zapatillacrud.service';
 import { IZapatilla } from '../shared/interfaces';
 import { ToastController } from '@ionic/angular';
 @Component({
@@ -15,14 +15,30 @@ export class DetailsPage implements OnInit {
   constructor(
     private activatedrouter: ActivatedRoute,
     private router: Router,
-    private zapatilladbService: ZapatilladbService,
+    private zapatillascrudService: ZapatillascrudService,
     public toastController: ToastController
   ) { }
   ngOnInit() {
     this.id = this.activatedrouter.snapshot.params.id;
-    this.zapatilladbService.getItem(this.id).then(
-      (data: IZapatilla) => this.zapatilla = data
-    );
+    this.zapatillascrudService.read_Zapatilla().subscribe(data => {
+      let zapatillas = data.map(e => {
+        return {
+          id: e.payload.doc.id,
+          isEdit: false,
+          name: e.payload.doc.data()['name'],
+          description: e.payload.doc.data()['description'],
+          category: e.payload.doc.data()['category'],
+          image: e.payload.doc.data()['image'],
+          price: e.payload.doc.data()['price']
+        };
+      })
+      console.log(zapatillas);
+      zapatillas.forEach(element => {
+          if(element.id == this.id){
+            this.zapatilla = element;
+          }
+      });
+    });
   }
 
   editRecord(zapatilla) {
@@ -38,7 +54,7 @@ export class DetailsPage implements OnInit {
           icon: 'delete',
           text: 'ACEPTAR',
           handler: () => {
-            this.zapatilladbService.remove(id);
+            this.zapatillascrudService.delete_Zapatilla(id);
             this.router.navigate(['home']);
           }
         }, {
